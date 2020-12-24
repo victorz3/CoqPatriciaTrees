@@ -278,6 +278,49 @@ induction p.
   - rewrite H0.
     trivial.
 + simpl.
+  destruct (N.eqb n k) eqn:equality.
+  - simpl in H.
+    rewrite equality in H.
+    inversion H.
+  - unfold join.
+    destruct (zeroBit k (branchingBit k n)) eqn:zero.
+    * simpl.
+      rewrite zero.
+      rewrite bin_eq.
+      trivial.
+    * simpl.
+      rewrite zero.
+      rewrite bin_eq.
+      trivial.
++ simpl.
+  destruct (matchPrefix k n n0) eqn:prefix.
+  - destruct (zeroBit k n0) eqn:zero.
+    * simpl.
+      rewrite zero.
+      apply IHp1.
+      simpl in H.
+      rewrite zero in H.
+      trivial.
+    * simpl.
+      rewrite zero.
+      apply IHp2.
+      simpl in H.
+      rewrite zero in H.
+      trivial.
+  - unfold join.
+    destruct (zeroBit k (branchingBit k n)) eqn:zero.
+    * simpl.
+      rewrite zero.
+      rewrite bin_eq.
+      trivial.
+    * simpl.
+      rewrite zero.
+      rewrite bin_eq.
+      trivial.
+Qed.
+      
+      
+    
 
 
 End PatriciaTrees.
