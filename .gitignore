@@ -1,0 +1,9 @@
+*.glob
+*~
+*.vo
+*.vok
+*.vos
+tema7.pdf
+Presentacion/*
+*.aux
+Proyecto1.v
