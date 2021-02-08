@@ -1,7 +1,8 @@
 Require Import BinNat.
 Require Import Bool.Bool.
-Require Import Program.Wf.
 Require Import Lia.
+Require Import Program.Wf.
+Require Import Program.
 
 From Proyecto Require Export Defs_Bin.
 From Proyecto Require Export Defs_Misc.
@@ -15,11 +16,11 @@ Inductive patriciaTree: Type :=
 | trie: N -> N -> patriciaTree -> patriciaTree -> patriciaTree.
 
 (* Tamaño de un Árbol Patricia *)
-Fixpoint size (p: patriciaTree) : nat :=
+Fixpoint sizeP (p: patriciaTree) : nat :=
 match p with
 |empty => O
 |leaf _ _ => S O
-|trie x y t1 t2 => (size t1) + (size t2)
+|trie x y t1 t2 => (sizeP t1) + (sizeP t2)
 end.
 
 (* Número de nodos en el árbol Patricia *)
@@ -90,14 +91,30 @@ Inductive correct: patriciaTree -> Prop :=
 | corrempty : correct empty
 | corrins: forall c k x t, correct t -> correct (insert c k x t).
 
+(* Subárbol izquierdo *)
+Definition left (t: patriciaTree) : patriciaTree :=
+match t with
+|empty => empty
+|leaf _ _ => empty
+|trie _ _ t1 _ => t1
+end.
+
+(* Subárbol derecho *)
+Definition right (t: patriciaTree) : patriciaTree :=
+match t with
+|empty => empty
+|leaf _ _ => empty
+|trie _ _ _ t2 => t2
+end.
+
 (* Función de combinación.
-   Usamos la medida de número de nodos para decirle a Coq que los argumentos sí se decrementan *)
+   Usamos la medida de número de nodos para decirle a Coq que los argumentos sí se decrementan 
  * Parámetros:
  * c - función a aplicar en caso de que la llave ya tenga elemento.
  * k - llave 
  * x - número a insertar
  * t - árbol *)
-Program Fixpoint merge (c : nat -> nat -> nat) (s t: patriciaTree) {measure ((nodes s) + (nodes t))}:=
+Program Fixpoint merge (c : nat -> nat -> nat) (s t: patriciaTree) {measure ((nodes s) + (nodes t))} : patriciaTree :=
 match s, t with
 | empty, _ => t
 | _, empty => s
@@ -121,9 +138,34 @@ Next Obligation.
 simpl.
 lia.
 Qed.
-
-Definition mergeAux (c : nat -> nat -> nat) (p q m n: N) (s0 s1 t0 t1: patriciaTree) :=
-let t := (trie q n t0 t1) 
-    in if zeroBit q m 
-       then trie p m (merge c s0 t) s1
-else trie p m s0 (merge c s1 t).
+Next Obligation.
+simpl.
+lia.
+Qed.
+Next Obligation.
+simpl.
+lia.
+Qed.
+Next Obligation.
+simpl.
+lia.
+Qed.
+Next Obligation.
+simpl.
+lia.
+Qed.
+Next Obligation.
+simpl.
+lia.
+Qed.
+Next Obligation.
+split.
+- intros.
+  intro.
+  destruct H3.
+  inversion H3.
+- intros.
+  intro.
+  destruct H3.
+  inversion H3.
+Defined.

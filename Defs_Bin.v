@@ -38,7 +38,7 @@ end.
  * positivo. *)
 Fixpoint lowestBitP (x: positive): positive :=
 match x with
-| xO x' => Pos.mul 2 (lowestBitP x')
+| xO x' => xO (lowestBitP x')
 | _ => xH
 end.
 
