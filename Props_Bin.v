@@ -524,3 +524,9 @@ induction a.
       unfold mask.
       simpl.
 Admitted. 
+
+(* Lema auxiliar matchPrefix k n n0 = true -> n0 < branchingBit en este caso*)
+Lemma very_specific: forall k x n n0, matchPrefix k (mask x (branchingBit x n)) (branchingBit x n) = false 
+                     /\ matchPrefix k n n0 = true -> matchPrefix x n n0 = true.
+Proof.
+Admitted.

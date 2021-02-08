@@ -387,16 +387,20 @@ induction p.
                    --- rewrite <- e in Zero; rewrite <- e in Zero2; rewrite Zero in Zero2; inversion Zero2.
                    --- destruct (matchPrefix k n n0) eqn:Prefix3.
                        *** simpl in H.
-                           (* Contradicción n0 > branchingBit x n > n0 *)
-                           admit.
+                           assert (matchPrefix x n n0 = true).
+                           ++++ apply (very_specific k x n n0).
+                                split; trivial.
+                           ++++ rewrite Prefix in H0; inversion H0.
                        *** simpl in H.
                            rewrite Zero3 in H.
                            trivial.
                +++ simpl in H.
                    destruct (matchPrefix k n n0) eqn:Prefix3.
                    --- simpl in H.
-                       (* Contradicción n0 > branchingBit x n > n0 *)
-                       admit.
+                       assert (matchPrefix x n n0 = true).
+                       *** apply (very_specific k x n n0).
+                           split; trivial.
+                       *** rewrite Prefix in H0; inversion H0.
                    --- simpl in H.
                        rewrite Zero3 in H.
                        trivial.
@@ -421,21 +425,17 @@ induction p.
          destruct (matchPrefix k n n0) eqn:Prefix3.
          -- simpl in H.
             destruct (zeroBit k (branchingBit x n)) eqn:Zero2.
-            ** admit. (*Misma contradicción de antes *)
+            ** assert (matchPrefix x n n0 = true).
+               +++ apply (very_specific k x n n0).
+                   split; trivial.
+               +++ rewrite Prefix in H0; inversion H0.
             ** destruct (N.eqb x k) eqn: Equal;trivial.
                apply eqb_eq in Equal; rewrite Equal in Prefix2; rewrite obvious_matchP in Prefix2; inversion Prefix2.
          -- simpl in H.
             destruct (zeroBit k (branchingBit x n)) eqn:Zero2; trivial.
             destruct (N.eqb x k) eqn:Equal; trivial.
             apply eqb_eq in Equal; rewrite Equal in Prefix2; rewrite obvious_matchP in Prefix2; inversion Prefix2.
-Admitted.
-                  
-                        
-                    
-            
-      
-    
-
+Qed.
 
 (* lookup y lookup2 son equivalentes en un árbol correcto. *)
 Theorem lookup_eq: forall t k, correct t -> lookup k t = lookup2 k t.
