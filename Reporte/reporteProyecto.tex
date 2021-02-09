@@ -11,6 +11,7 @@
 \usepackage{tikz} %% Para dibujar una lista simplemente ligada
 \usetikzlibrary{calc,shapes.multipart,chains,arrows, babel}
 \usepackage{forest}
+\usepackage{caption}
 
 %% Cambiar "listing" por "listado"
 \renewcommand\listingscaption{Listado}
@@ -41,10 +42,28 @@ Por supuesto, si los árboles Patricia estuvieran implementados como el de la fi
 En este trabajo se decidió hacer una implementación de árboles Patricia en Coq. Se comenzó desde lo más básico, que son los tries binarios (estructuras de la figura~\ref{fig:Pat}) hasta llegar a la estructura final. Para la estructura final, se implementaron las operaciones de búsqueda, inserción y unión, de las cuales también hablaremos más adelante. Además se verificó el funcionamiento de la inserción con respecto a búsquedas. Para la unión no se verificó nada debido a la forma en la que tuvo que definirse; sin embargo se logró definir a pesar de que utiliza recursión distinta a la que se trabajó con Coq a lo largo del semestre.
 
 \section{Estructura del Proyecto}
+
 \noindent El proyecto está dividido en dos tipos de archivos: de definiciones y de proposiciones. Los archivos de definiciones son:
+
 \begin{itemize}
-  \item 
+\item \texttt{Defs\_Bin.v} - Contiene definiciones de funciones sobre números binarios.
+\item \texttt{Defs\_Misc.v} - Contiene definiciones miscelaneas.
+\item \texttt{Defs\_Patricia.v} - Contiene definiciones de árboles Patricia.
+\item \texttt{Defs\_Trie.v} - Contiene definiciones de tries binarios y sus optimizaciones.
 \end{itemize}
+
+Los archivos de proposiciones son:
+
+\begin{itemize}
+\item \texttt{Props\_Bin.v} - Contiene proposiciones de funciones sobre números binarios.
+\item \texttt{Props\_Misc.v} - Contiene proposiciones miscelaneas.
+\item \texttt{Props\_Patricia.v} - Contiene proposiciones de árboles Patricia.
+\item \texttt{Props\_Trie.v} - Contiene proposiciones de tries binarios y sus optimizaciones.
+\end{itemize}
+
+Para que el proyecto funcione correctamente, es necesario compilar cada archivo por separado. Esto se puede hacer desde CoqIde con Compile $\rightarrow$ Compile buffer.
+
+Se utilizó la versión \textbf{8.13} de CoqIde. No se garantiza el funcionamiento del proyecto en versiones anteriores o posteriores de CoqIde.
 
 \section{Herramientas}
 
@@ -55,7 +74,7 @@ En este trabajo se decidió hacer una implementación de árboles Patricia en Co
 \item \texttt{Bool.Bool} - Para propiedades sobre el tipo \texttt{Bool} de Coq.
 \end{itemize}
 
-\section{Desarrollo}
+\section{Desarrollo de árboles Patricia}\label{section:desarrollo}
 
 \subsection{Tries binarios}
 
@@ -154,8 +173,119 @@ Para esto, definimos la nueva estructura dada por el listado~\ref{lst:trie3}. La
   \label{lst:zeroBit}
 \end{listing}
 
+\subsection{Árboles Patricia}
+\noindent Nos encontramos muy cerca de los árboles Patricia. Solo nos falta hacer una optimización más a nuestros tries binarios.
+
+El caso que nos falta optimizar es en el que todas las hojas tienen un prefijo en común. En este caso, la búsqueda recorrerá los bits del prefijo uno a la vez hasta llegar a un nodo del que salen todas las hojas. Esto se puede optimizar si nos evitamos recorrer los bits del prefijo. Como sabemos que hay un solo prefijo útil en el subárbol, podemos colapsar ese camino. La estructura bajo esta optimización es a lo que llamamos árbol Patricia. De nuevo, hay que cambiar nuestra estructura de datos, ahora para que los nodos internos guarden el prefijo que se ha leído hasta el momento. La nueva estructura está en el listado~\ref{lst:patricia}. Un ejemplo de un árbol Patricia está en la figura~\ref{fig:Patricia}.
+
+\begin{listing}[H]
+  \inputminted{coq}{src/patricia.v}
+  \caption{Definición de árboles Patricia}
+  \label{lst:patricia}
+\end{listing}
+
+\begin{figure}[h]
+\label{fig:Patricia}
+\caption{Figura obtenida en \cite{} y modificada posteriormente. Los números en rojo representan los prefijos y bits que se guardan en cada nodo.}
+\centering
+\includegraphics[ width=0.5\textwidth]{img/pat2}
+\end{figure}
+
+\section{Metas del proyecto}
+\noindent Se plantearon las siguientes metas de manera concreta:
+\begin{enumerate}
+\item Definir tries binarios. \label{itm:tries}
+\item Definir árboles Patricia.\label{itm:pat}
+\item Definir la operación de búsqueda en árboles Patricia.\label{itm:lookup}
+\item Definir la operación de inserción en árboles Patricia. \label{itm:insert}
+\item Demostrar corrección de inserción con respecto a búsquedas.\label{itm:dem1}
+\item Definir operación de unión de dos árboles Patricia.\label{itm:defUnion}
+\item Demostrar corrección de la unión. \label{itm:union}
+\item Definir una operación alternativa de búsqueda más óptima.\label{itm:busqueda2}
+\item Demostrar equivalencia entre ambas operaciones de búsqueda.\label{itm:prueba2} 
+\end{enumerate}
+\section{Resultados}
+\noindent Todas las metas se lograron excepto por la meta~\ref{itm:union}. Las metas~\ref{itm:tries} y~\ref{itm:pat} se mencionaron en la sección~\ref{section:desarrollo}, por lo que únicamente mencionaremos los resultados de las demás metas.
+\subsection{Meta~\ref{itm:lookup}}
+\noindent La implementación de la función de búsqueda se puede ver en el listado~\ref{lst:busqueda} y es practicamente una copia de la que se encuentra en\cite{}. La función \texttt{matchPrefix} se encarga de ver si, dados tres enteros $k$, $p$ y $m$, $k$ y $p$ coinciden en los primeros $\log_2m$ bits.
+
+\begin{listing}[H]
+  \inputminted{coq}{src/busqueda.v}
+  \caption{Función de búsqueda para árboles Patricia}
+  \label{lst:busqueda}
+\end{listing}
+
+La función \texttt{zeroBit} nos dice, para dos números $k$ y $m$, si el $\log_2m$-ésimo bit de $k$ es $0$.
+
+La función \texttt{mask} es una máscara como en la definición usual, salvo porque en lugar de recibir un número de la forma $2^n-1$, recibe uno de la forma $2^n$ y saca el predecesor de este.
+
+Las funciones \texttt{matchPrefix}, \texttt{zeroBit} y \texttt{mask} están en el listado~\ref{lst:bin}.
+
+\begin{listing}[H]
+  \inputminted{coq}{src/bin.v}
+  \caption{Definiciones de operaciones binarias en Coq}
+  \label{lst:bin}
+\end{listing}
+
+\subsection{Meta~\ref{itm:insert}}
+\noindent La función de inserción también se sacó de\cite{} y está en el listado~\ref{lst:insert}. 
+
+\begin{listing}[H]
+  \inputminted{coq}{src/insert.v}
+  \caption{Función de inserción}
+  \label{lst:insert}
+\end{listing}
+
+\subsection{Meta~\ref{itm:dem1}}
+\noindent Se logró satisfactoriamente demostrar la correción de la inserción con respecto a la búsqueda. Se demostró la corrección en dos casos: cuando el elemento insertado no estaba previamente en el árbol y cuando sí estaba ahí.
+
+\subsection{Meta~\ref{itm:defUnion}}
+\noindent Esta meta se logró satisfactoriamente, aunque no de la manera que se esperaba. Debido a que la función de unión que se obtuvo del artículo no era recursiva simple, esta no se pudo definir usando \texttt{Fixpoint}. Investigando en internet se encontró un conjunto de tácticas denominadas \texttt{Program}\cite{}, en donde se encuentra el comando \texttt{Program Fixpoint}, a partir del cual se pueden definir funciones con recursiones más complicadas que las aceptadas por \texttt{Fixpoint}.
+
+Para definir una función con \texttt{Program Fixpoint}, basta con hacer lo siguiente:
+
+\begin{enumerate}
+\item Definir una medida que decrezca con cada paso de la recursión. En nuestro caso, utilizamos el número de nodos de los árboles como medida.
+\item Probar que la recursión termina.
+\end{enumerate}
+
+La definición de nuestra función con \texttt{Program Fixpoint} está en el listado~\ref{lst:pf}. Tras definirla, tuvimos que probar una serie de obligaciones para convencer al asistente de que la recursión terminaba.
+
+\begin{listing}[H]
+  \inputminted{coq}{src/ProgramFixpoint.v}
+  \caption{Función de inserción}
+  \label{lst:pf}
+\end{listing}
+
+
+Este programa que a la vista de cualquier programador experimentado parece sencillo, en realidad causa dificultades para sistemas tan rigurosos como Coq. Es una de las formas en que podemos darnos cuenta de que la verificación formal aún tiene mucho hacia dónde crecer.
+
+\subsection{Meta~\ref{itm:union}}
+\noindent Esta meta no se logró debido a la poca experiencia con el uso de \texttt{Program}.
+
+Al intentar demostrar propiedades con respecto a la función \texttt{merge}, nos topamos con que las definiciones escritas con \texttt{Program Fixpoint} no se pueden simplificar. Esto nos dejó como opción el desdoblar la definición. Desgraciadamente, parece que no era la forma correcta de resolver el problema, pues el desdoblar la definición nos lo que está en el listado~\ref{lst:ilegible}: un programa ilegible.
+
+  \inputminted{coq}{src/ilegible.v}
+  \captionof{listing}{Código ilegible\label{lst:ilegible}}
+  \subsection{Metas~\ref{itm:busqueda2} y~\ref{itm:prueba2}}
+  \noindent Como no logramos la meta~\ref{itm:union}, decidimos cambiarla por otra tarea. En el artículo se menciona una definición alternativa de \texttt{lookup} que es un poco más eficiente. La tarea que nos dimos fue definir esta función y probar su equivalencia con la otra función de búsqueda. La definición de la función está en el listado~\ref{lst:lookup2}.
+
+  \begin{listing}[H]
+  \inputminted{coq}{src/lookup2.v}
+  \caption{Función de búsqueda más eficiente}
+  \label{lst:lookup2}
+\end{listing}
+
+
+  La meta se logró de manera satisfactoria, aunque por desgracia, tuvimos que admitir algunos lemas sobre números binarios por falta de tiempo. Considerando que nuestro archivo de propiedades sobre números binarios ya sobrepasa las $500$ líneas, es de nuestra opinión que haber demostrado toda las propiedades habría sido un proyecto por sí mismo; por esto, nos sentimos satisfechos a pesar de no haber demostrado todo.
+
+  \section{Conclusiones}
+  \noindent Se lograron satisfactoriamente la mayoría de las metas. Para un futuro, sería bueno aprender a utilizar \texttt{Program} y terminar las demostraciones de números binarios; aún así, el trabajo que se hizo está bastante completo.
+
+  Con este proyecto nos quedamos con el aprendizaje de que realizar un proyecto de un ejemplo real, por más pequeño que parezca, es una gran tarea. La verificación formal está en pañales y con buena razón; es difícil avanzar en el trabajo. Sin embargo, creemos que poco a poco, mientras haya dedicación e ideas, habrá un futuro en el que el área de verificación formal prolifere.
+
 \nocite{*}
  \bibliographystyle{IEEEtran}
  \bibliography{Proyecto}
-
+ 
 \end{document}

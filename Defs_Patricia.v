@@ -108,12 +108,11 @@ match t with
 end.
 
 (* Función de combinación.
-   Usamos la medida de número de nodos para decirle a Coq que los argumentos sí se decrementan 
+   Usamos la medida de número de nodos para decirle a Coq que los
+   argumentos sí se decrementan
  * Parámetros:
  * c - función a aplicar en caso de que la llave ya tenga elemento.
- * k - llave 
- * x - número a insertar
- * t - árbol *)
+ * s t - árboles *)
 Program Fixpoint merge (c : nat -> nat -> nat) (s t: patriciaTree) {measure ((nodes s) + (nodes t))} : patriciaTree :=
 match s, t with
 | empty, _ => t
@@ -169,3 +168,9 @@ split.
   destruct H3.
   inversion H3.
 Defined.
+
+Theorem prueba: forall t1 t2 c, t1 <> empty -> merge c t1 t2 <> empty.
+Proof.
+unfold merge.
+unfold merge_func.
+Admitted.
