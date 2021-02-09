@@ -7,3 +7,6 @@ tema7.pdf
 Presentacion/*
 *.aux
 Proyecto1.v
+Reporte/_minted-reporteProyecto/*
+*.log
+*.aux

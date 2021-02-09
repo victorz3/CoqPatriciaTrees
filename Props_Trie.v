@@ -20,7 +20,7 @@ Proof.
 intros.
 destruct t1 eqn:T1; destruct t2 eqn:T2; simpl; trivial.
 + apply obvious_if.
-+ Admitted.  
++ Admitted.
 
 
 

@@ -523,10 +523,72 @@ induction a.
     - unfold matchPrefix.
       unfold mask.
       simpl.
-Admitted. 
+Admitted.
 
+(* matchPrefix k x y = false /\ matchPrefix k x z = true -> z < y *)
+Lemma matchP_lt: forall k x y z, matchPrefix k x y = false /\ matchPrefix k x z = true -> (N.lt z y).
+Proof.
+induction k.
++ intros.
+  destruct H.
+  unfold matchPrefix in H0.
+  unfold mask in H0.
+  simpl in H0.
+  destruct x eqn:X.
+  - unfold matchPrefix in H.
+    unfold mask in H.
+    simpl in H.
+    inversion H.
+  - inversion H0.
++ intros.
+  unfold matchPrefix in H.
+  unfold mask in H.
+  destruct H.
+  simpl in H.
+  simpl in H0.
+  destruct y eqn:Y.
+  - simpl in H.
+    destruct x eqn:X.
+    * inversion H.
+    * destruct z eqn:Z.
+      ++ simpl in H0.
+         inversion H0.
+      ++ destruct p1 eqn:P1.
+         -- simpl in H0.
+Admitted.
+  
 (* Lema auxiliar matchPrefix k n n0 = true -> n0 < branchingBit en este caso*)
 Lemma very_specific: forall k x n n0, matchPrefix k (mask x (branchingBit x n)) (branchingBit x n) = false 
                      /\ matchPrefix k n n0 = true -> matchPrefix x n n0 = true.
 Proof.
+destruct k.
++ intros.
+  destruct H.
+  unfold matchPrefix in H0.
+  simpl in H0.
+  destruct n eqn:N.
+  - unfold matchPrefix in H.
+    simpl in H.
+    unfold branchingBit in H.
+    rewrite xor_neutral in H.
+    rewrite lowestBit_mask in H.
+    inversion H.
+  - inversion H0.
++ intros.
+  induction p.
+  - apply IHp.
+    unfold matchPrefix in H; unfold branchingBit in H; destruct H.
+    simpl in H.
+    unfold matchPrefix; unfold branchingBit.
+    simpl.
+    destruct (lowestBit (N.lxor x n)) eqn:Low.
+    * simpl.
+      simpl in H.
+      split.
+      trivial.
+      simpl in H0.
+      destruct (N.pred n0) eqn:Pred.
+      ++ trivial.
+      ++ destruct p0 eqn:P0.
+         -- simpl in H0.
 Admitted.

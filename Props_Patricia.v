@@ -277,8 +277,86 @@ Theorem lookup2_after_insert_none: forall (c: nat -> nat -> nat) (k k0: N)
                                     (x: nat) (p: patriciaTree),
 lookup2 k p = None -> k <> k0 -> lookup2 k (insert c k0 x p) = None.
 Proof. 
-Admitted.
-
+induction p.
++ intros.
+  simpl.
+  destruct (N.eqb k0 k) eqn:Equal.
+  - apply eqb_eq in Equal.
+    rewrite Equal in H0; contradiction.
+  - trivial.
++ intros.
+  simpl.
+  destruct (N.eqb n k0) eqn:Equal.
+  - apply eqb_eq in Equal.
+    simpl.
+    destruct (N.eqb k0 k) eqn:Equal2; trivial.
+    apply eqb_eq in Equal2.
+    intuition.
+  - unfold join.
+    destruct (zeroBit k0 (branchingBit k0 n)) eqn:Zero.
+    * simpl.
+      destruct (zeroBit k (branchingBit k0 n)) eqn:Zero2.
+      ++ destruct (N.eqb k0 k) eqn:Equal2; trivial.
+         apply eqb_eq in Equal2.
+         intuition.
+      ++ destruct (N.eqb n k) eqn:Equal2; trivial.
+         apply eqb_eq in Equal2.
+         rewrite Equal2 in H.
+         simpl in H.
+         rewrite bin_eq in H.
+         inversion H.
+    * simpl.
+      destruct (zeroBit k (branchingBit k0 n)) eqn:Zero2.
+      ++ destruct (N.eqb n k) eqn:Equal2;trivial.
+         apply eqb_eq in Equal2.
+         rewrite Equal2 in H.
+         simpl in H.
+         rewrite bin_eq in H.
+         inversion H.
+      ++ destruct (N.eqb k0 k) eqn:Equal2; trivial.
+         apply eqb_eq in Equal2.
+         intuition.
++ intros.
+  simpl.
+  destruct (matchPrefix k0 n n0) eqn:Prefix.
+  - destruct (zeroBit k0 n0) eqn:Zero.
+    * simpl.
+      destruct (zeroBit k n0) eqn:Zero2.
+      ++ apply IHp1; trivial.
+         simpl in H.
+         rewrite Zero2 in H.
+         trivial.
+      ++ simpl in H.
+         rewrite Zero2 in  H.
+         trivial.
+    * simpl.
+      destruct (zeroBit k n0) eqn:Zero2.
+      ++ simpl in H.
+         rewrite Zero2 in H.
+         trivial.
+      ++ apply IHp2; trivial.
+         simpl in H.
+         rewrite Zero2 in H.
+         trivial.
+  - unfold join.
+    destruct (zeroBit k0 (branchingBit k0 n)) eqn:Zero.
+    * simpl.
+      destruct (zeroBit k (branchingBit k0 n)) eqn:Zero2.
+      ++ destruct (N.eqb k0 k) eqn:Equal; trivial.
+         apply eqb_eq in Equal.
+         intuition.
+      ++ destruct (zeroBit k n0) eqn:Zero3.
+         -- simpl in H.
+            rewrite Zero3 in H.
+            trivial.
+         -- simpl in H; rewrite Zero3 in H; trivial.
+    * simpl.
+      destruct (zeroBit k (branchingBit k0 n)) eqn:Zero2.
+      ++ destruct (zeroBit k n0) eqn:Zero3;simpl in H; rewrite Zero3 in H; trivial.
+      ++ destruct (N.eqb k0 k) eqn:Equal; trivial.
+         apply eqb_eq in Equal.
+         intuition.
+Qed.
 
 (* lookup después de insert y lookup2 después de insert dan lo mismo en 
    árboles correctos *)
