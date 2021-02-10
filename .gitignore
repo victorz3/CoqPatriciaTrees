@@ -11,3 +11,5 @@ Reporte/_minted-reporteProyecto/*
 *.log
 *.aux
 Presentacion2/*
+*.bbl
+*.blg

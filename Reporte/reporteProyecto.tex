@@ -28,11 +28,11 @@
   \noindent La meta de este trabajo fue realizar una implementación de árboles Patricia en Coq. Para esta implementación, era deseable demostrar que las operaciones principales funcionaban; con esto nos referimos a las operaciones de inserción y unión de árboles. La meta se logró de manera satisfactoria para la operación de inserción. Para la de unión, hubieron algunos problemas que evitaron que demostráramos propiedades sobre ella, pero al menos se demostró que la función utiliza recursión bien fundada.
 \end{abstract}
 \section{Introducción}
-\noindent Los Árboles Patricia\cite{} son estructuras de datos que funcionan como diccionarios con llaves enteras. Son atractivos debido a la sencillez con la que se implementan en lenguajes funcionales y debido a su eficiencia. La idea básica es que se tiene un árbol en el que el $0$ representa ``izquierda'' y el $1$ representa ``derecha''. Por ejemplo, en el árbol de la figura~\ref{fig:Pat}, el elemento $y$ tiene llave $4$, pues $4=100$ y para llegar a $y$ tenemos que tomar el camino izquierda-izquierda-derecha (leyendo el número de adelante hacia atrás). Como podemos notar, los elementos siempre estarán en hojas de los árboles.
+\noindent Los Árboles Patricia\cite{okasaki_fast_1998} son estructuras de datos que funcionan como diccionarios con llaves enteras. Son atractivos debido a la sencillez con la que se implementan en lenguajes funcionales y debido a su eficiencia. La idea básica es que el $0$ representa ``izquierda'' y el $1$ representa ``derecha''. Por ejemplo, en el árbol de la figura~\ref{fig:Pat}, el elemento $y$ tiene llave $4$, pues $4=100$ y para llegar a $y$ tenemos que tomar el camino izquierda-izquierda-derecha (leyendo el número de adelante hacia atrás). Como podemos notar, los elementos siempre estarán en hojas de los árboles.
 
 \begin{figure}[h]
+\caption{Figura obtenida en \cite{okasaki_fast_1998}}
 \label{fig:Pat}
-\caption{Figura obtenida en \cite{}}
 \centering
 \includegraphics[ width=0.5\textwidth]{img/pat1}
 \end{figure}
@@ -67,7 +67,7 @@ Se utilizó la versión \textbf{8.13} de CoqIde. No se garantiza el funcionamien
 
 \section{Herramientas}
 
-\noindent Para el desarrollo del proyecto, utilizamos algunas bibliotecas auxiliares de Coq. La más importante de estas fue la biblioteca \texttt{BinNat}\cite{} que define a los números naturales en binario. Esta biblioteca se usó para definir las llaves y la estructura general de los árboles. Además de esta, utilizamos las siguientes bibliotecas:
+\noindent Para el desarrollo del proyecto, utilizamos algunas bibliotecas auxiliares de Coq. La más importante de estas fue la biblioteca \texttt{BinNat}\cite{noauthor_standard_nodate} que define a los números naturales en binario. Esta biblioteca se usó para definir las llaves y la estructura general de los árboles. Además de esta, utilizamos las siguientes bibliotecas:
 \begin{itemize}
 \item \texttt{BinPos} - Para enteros positivos binarios (naturales sin cero).
 \item \texttt{Lia} - Para demostrar propiedades de operaciones aritméticas.
@@ -78,7 +78,7 @@ Se utilizó la versión \textbf{8.13} de CoqIde. No se garantiza el funcionamien
 
 \subsection{Tries binarios}
 
-\noindent Decidimos basarnos completamente en\cite{} para el desarrollo del proyecto. Esto implicó una optimización gradual del trie binario hasta llegar a árboles Patricia.
+\noindent Decidimos basarnos completamente en\cite{okasaki_fast_1998} para el desarrollo del proyecto. Esto implicó una optimización gradual del trie binario hasta llegar a árboles Patricia.
 
 El trie binario es la estructura de datos de la figura~\ref{fig:Pat}. Básicamente es un árbol binario en el que cada arista está etiquetada con $0$ o $1$, dependiendo de si es arista izquierda o derecha. Los nodos internos no contienen ninguna información; son las hojas quienes contienen a los elementos del árbol. Nuestra definición del trie binario se encuentra en el listado~\ref{lst:trieBin}.
 
@@ -153,7 +153,7 @@ Después de realizar esta optimización, hay que modificar ligeramente la funci�
 
 Como guardar la profundidad complica los cálculos de buscar el bit correspondiente, en la práctica lo que se hace es guardar un entero binario con un solo bit prendido, y revisar dicho bit en la llave buscada.
 
-Para esto, definimos la nueva estructura dada por el listado~\ref{lst:trie3}. La nueva función de búsqueda se encuentra en el listado~\ref{lst:lookup3}. La función \texttt{zeroBit} nos dice si el bit prendido de \texttt{m} está apagado en \texttt{key}. Podemos verla en el listado~\ref{lst:zeroBit}.
+Para esto, definimos la nueva estructura dada por el listado~\ref{lst:trie3}. La nueva función de búsqueda se encuentra en el listado~\ref{lst:lookup3}. La función \texttt{zeroBit} nos dice si el bit prendido de \texttt{m} está apagado en \texttt{key}.
 
 \begin{listing}[H]
   \inputminted{coq}{src/trie3.v}
@@ -165,12 +165,6 @@ Para esto, definimos la nueva estructura dada por el listado~\ref{lst:trie3}. La
   \inputminted{coq}{src/lookup3.v}
   \caption{Nueva función de búsqueda}
   \label{lst:lookup3}
-\end{listing}
-
-\begin{listing}[H]
-  \inputminted{coq}{src/zeroBit.v}
-  \caption{Función que revisa si un bit está apagado}
-  \label{lst:zeroBit}
 \end{listing}
 
 \subsection{Árboles Patricia}
@@ -185,8 +179,8 @@ El caso que nos falta optimizar es en el que todas las hojas tienen un prefijo e
 \end{listing}
 
 \begin{figure}[h]
-\label{fig:Patricia}
-\caption{Figura obtenida en \cite{} y modificada posteriormente. Los números en rojo representan los prefijos y bits que se guardan en cada nodo.}
+  \caption{Figura obtenida en \cite{noauthor_unit_nodate} y modificada posteriormente. Los números en rojo representan los prefijos y bits que se guardan en cada nodo.}
+  \label{fig:Patricia}
 \centering
 \includegraphics[ width=0.5\textwidth]{img/pat2}
 \end{figure}
@@ -207,15 +201,13 @@ El caso que nos falta optimizar es en el que todas las hojas tienen un prefijo e
 \section{Resultados}
 \noindent Todas las metas se lograron excepto por la meta~\ref{itm:union}. Las metas~\ref{itm:tries} y~\ref{itm:pat} se mencionaron en la sección~\ref{section:desarrollo}, por lo que únicamente mencionaremos los resultados de las demás metas.
 \subsection{Meta~\ref{itm:lookup}}
-\noindent La implementación de la función de búsqueda se puede ver en el listado~\ref{lst:busqueda} y es practicamente una copia de la que se encuentra en\cite{}. La función \texttt{matchPrefix} se encarga de ver si, dados tres enteros $k$, $p$ y $m$, $k$ y $p$ coinciden en los primeros $\log_2m$ bits.
+\noindent La implementación de la función de búsqueda se puede ver en el listado~\ref{lst:busqueda} y es practicamente una copia de la que se encuentra en\cite{okasaki_fast_1998}. La función \texttt{matchPrefix} se encarga de ver si, dados tres enteros $k$, $p$ y $m$, $k$ y $p$ coinciden en los primeros $\log_2m$ bits.
 
 \begin{listing}[H]
   \inputminted{coq}{src/busqueda.v}
   \caption{Función de búsqueda para árboles Patricia}
   \label{lst:busqueda}
 \end{listing}
-
-La función \texttt{zeroBit} nos dice, para dos números $k$ y $m$, si el $\log_2m$-ésimo bit de $k$ es $0$.
 
 La función \texttt{mask} es una máscara como en la definición usual, salvo porque en lugar de recibir un número de la forma $2^n-1$, recibe uno de la forma $2^n$ y saca el predecesor de este.
 
@@ -228,7 +220,7 @@ Las funciones \texttt{matchPrefix}, \texttt{zeroBit} y \texttt{mask} están en e
 \end{listing}
 
 \subsection{Meta~\ref{itm:insert}}
-\noindent La función de inserción también se sacó de\cite{} y está en el listado~\ref{lst:insert}. 
+\noindent La función de inserción también se obtuvo de\cite{okasaki_fast_1998} y está en el listado~\ref{lst:insert}. 
 
 \begin{listing}[H]
   \inputminted{coq}{src/insert.v}
@@ -240,7 +232,7 @@ Las funciones \texttt{matchPrefix}, \texttt{zeroBit} y \texttt{mask} están en e
 \noindent Se logró satisfactoriamente demostrar la correción de la inserción con respecto a la búsqueda. Se demostró la corrección en dos casos: cuando el elemento insertado no estaba previamente en el árbol y cuando sí estaba ahí.
 
 \subsection{Meta~\ref{itm:defUnion}}
-\noindent Esta meta se logró satisfactoriamente, aunque no de la manera que se esperaba. Debido a que la función de unión que se obtuvo del artículo no era recursiva simple, esta no se pudo definir usando \texttt{Fixpoint}. Investigando en internet se encontró un conjunto de tácticas denominadas \texttt{Program}\cite{}, en donde se encuentra el comando \texttt{Program Fixpoint}, a partir del cual se pueden definir funciones con recursiones más complicadas que las aceptadas por \texttt{Fixpoint}.
+\noindent Esta meta se logró satisfactoriamente, aunque no de la manera que se esperaba. Debido a que la función de unión que se obtuvo del artículo no era recursiva simple, esta no se pudo definir usando \texttt{Fixpoint}. Investigando en internet se encontró un conjunto de tácticas denominadas \texttt{Program}\cite{noauthor_program_nodate}, en donde se encuentra el comando \texttt{Program Fixpoint}, a partir del cual se pueden definir funciones con recursiones más complicadas que las aceptadas por \texttt{Fixpoint}.
 
 Para definir una función con \texttt{Program Fixpoint}, basta con hacer lo siguiente:
 
@@ -251,10 +243,18 @@ Para definir una función con \texttt{Program Fixpoint}, basta con hacer lo sigu
 
 La definición de nuestra función con \texttt{Program Fixpoint} está en el listado~\ref{lst:pf}. Tras definirla, tuvimos que probar una serie de obligaciones para convencer al asistente de que la recursión terminaba.
 
+La función \texttt{br} es el constructor inteligente de árboles Patricia y está en el listado~\ref{lst:br}.
+
 \begin{listing}[H]
   \inputminted{coq}{src/ProgramFixpoint.v}
   \caption{Función de inserción}
   \label{lst:pf}
+\end{listing}
+
+\begin{listing}[H]
+  \inputminted{coq}{src/br.v}
+  \caption{Constructor inteligente de árboles Patricia}
+  \label{lst:br}
 \end{listing}
 
 
@@ -263,7 +263,7 @@ Este programa que a la vista de cualquier programador experimentado parece senci
 \subsection{Meta~\ref{itm:union}}
 \noindent Esta meta no se logró debido a la poca experiencia con el uso de \texttt{Program}.
 
-Al intentar demostrar propiedades con respecto a la función \texttt{merge}, nos topamos con que las definiciones escritas con \texttt{Program Fixpoint} no se pueden simplificar. Esto nos dejó como opción el desdoblar la definición. Desgraciadamente, parece que no era la forma correcta de resolver el problema, pues el desdoblar la definición nos lo que está en el listado~\ref{lst:ilegible}: un programa ilegible.
+Al intentar demostrar propiedades con respecto a la función \texttt{merge}, nos topamos con que las definiciones escritas con \texttt{Program Fixpoint} no se pueden simplificar. Esto nos dejó como opción el desdoblar la definición. Desgraciadamente, parece que no era la forma correcta de resolver el problema, pues el desdoblar la definición nos da lo que está en el listado~\ref{lst:ilegible}: un programa ilegible.
 
   \inputminted{coq}{src/ilegible.v}
   \captionof{listing}{Código ilegible\label{lst:ilegible}}
